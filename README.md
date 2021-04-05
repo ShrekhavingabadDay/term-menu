@@ -1,2 +1,3 @@
 # term-menu
-Provides a TUI to execute terminal-based applications.
+
+A *hub* for starting your terminal-based applications.
