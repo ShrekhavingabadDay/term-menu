@@ -99,9 +99,14 @@ cmds=()
 
 # read the config file
 while IFS= read -r line; do
+    # check if line is a comment
+    if [ $( echo "${line}" | cut -c 1-1 ) != "#" ]; then
+
     IFS=':' read -ra both <<< "$line"
-    names+=("${both[0]}")
-    cmds+=("${both[1]}") 
+
+	names+=("${both[0]}")
+	cmds+=("${both[1]}")
+    fi
 done < "$HOME/.config/term-menu/games"
 
 length=${#names[@]}
