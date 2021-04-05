@@ -1,3 +1,9 @@
+# you can leave comments in this file, but make sure the '#' character is at the beginning of a new line
+# this file will be placed in ~/.config/term-menu/
+#
+# ':' is the separator -> left side is the name which is going to be displayed on screen, right side is command
+#
+#
 Moon Buggy:moon-buggy
 Rogue:rogue
 Bonsai generator:cbonsai -l -c S,H,R,E,K
