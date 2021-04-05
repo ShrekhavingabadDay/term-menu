@@ -1,0 +1,136 @@
+#!/bin/bash
+
+# move selection up one row
+up () {
+    if [ ${current} -gt 0 ]; then
+        current=$((current-1))
+    fi
+    tui
+}
+
+# move selection down one row
+down () {
+    if [ ${current} -lt $((length-1)) ]; then
+        current=$((current+1))
+    fi
+    tui
+}
+
+# execute command at index
+run_game () {
+    eval ${cmds[${current}]}
+    clear
+    printf '\e[?25l'
+    tui
+}
+
+# neofetch author man has this on his github repo helping aspiring developers to create a tui in bash
+get_term_size() {
+    read -r LINES COLUMNS < <(stty size)
+}
+
+# prints a given amount of space characters
+indent () {
+    for i in $(seq 1 $1); do printf ' '; done
+}
+
+# 'render' the text-user-interface
+tui () {
+    clear
+    for (( n=0; n < ${#names[*]}; n++ )); do
+
+        wordlength=${#names[n]}
+
+        move_to=$(( $(( COLUMNS / 2 )) - $(( wordlength / 2 )) ))
+
+        indent $move_to
+
+        # selected item gets rendered with bold font and something like this : -----
+        if [ ${n} -eq ${current} ]; then
+            for i in $(seq 1 $wordlength); do printf '-'; done
+
+            printf '\n'
+
+            indent $move_to
+
+            printf "\033[1m${names[n]}\033[0m\n"
+
+            indent $move_to
+
+            for i in $(seq 1 $wordlength); do printf '-'; done
+
+            printf '\n'
+
+        else
+            printf "${names[n]}\n"
+        fi
+    done
+    
+    if [ "${h}" = "true" ]; then
+        printf "'k' to move up\n'j' to move down\n'ENTER' to select item\n'q' to quit\n(edit '~/.config/game-tui/games' to add items)"
+    fi
+}
+
+# quit the program
+q () {
+    quit='true'
+    clear
+    printf '\e[?25h'
+}
+
+# Handle trapped ctrl-c because the user might try to exit that way. Let them succeed.
+ctrl_c () {
+    clear
+    printf '\e[?25h'
+    exit
+}
+
+get_term_size
+
+h="false"
+
+current=0
+
+quit='false'
+
+# declare separate arrays for names of items and commands to execute when one of them is chosen
+names=()
+cmds=()
+
+# read the config file
+while IFS= read -r line; do
+    IFS=':' read -ra both <<< "$line"
+    names+=("${both[0]}")
+    cmds+=("${both[1]}") 
+done < "$HOME/.config/term-menu/games"
+
+length=${#names[@]}
+
+# parse arguments
+while getopts "h" opt; do
+    case $opt in
+        h) h="true" ;;
+    esac
+done
+
+# hide the cursor
+printf '\e[?25l'
+
+tui
+
+while [ ${quit} != 'true' ]; do
+
+    # trap ctrl-c to unhide cursor and reset certain terminal values
+    trap ctrl_c INT
+
+    # take input from user
+    read -sn 1 key
+
+    case "$key" in
+        'k') up;;
+        'j') down;;
+        'q') q;;
+        '') run_game;;
+    esac
+
+done

@@ -1,0 +1,7 @@
+Moon Buggy:moon-buggy
+Rogue:rogue
+Flappy Bird:~/software/games/floppyberd/AsciiBird/flap
+Snake:~/software/games/snake/snake
+Tetris(written in C):~/software/games/tetris/c_tetris/test
+Tetris(written in python):python ~/software/games/tetris/python_tetris/tetris/ui.py
+Bonsai generator:cbonsai -l -c S,H,R,E,K
